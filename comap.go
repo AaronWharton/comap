@@ -28,15 +28,26 @@ func (c ConcurrentMap) GetValue(key string) interface{} {
 	return cmap.comap[key]
 }
 
-func (c ConcurrentMap) SetValue(key string, value interface{}) {
-	val, err := strconv.Atoi(key)
-	if err != nil {
-		fmt.Println(err)
+func (m ConcurrentMap) Set(key string, value interface{}) {
+	// Get map shard.
+	shard := m.GetShard(key)
+	shard.Lock()
+	shard.comap[key] = value
+	shard.Unlock()
+}
+
+func (m ConcurrentMap) GetShard(key string) *Comap {
+	return m[uint(fnv32(key))%uint(COUNT)]
+}
+
+func fnv32(key string) uint32 {
+	hash := uint32(2166136261)
+	const prime32 = uint32(16777619)
+	for i := 0; i < len(key); i++ {
+		hash *= prime32
+		hash ^= uint32(key[i])
 	}
-	cmap := c[val]
-	cmap.Lock()
-	defer cmap.Unlock()
-	cmap.comap[key] = value
+	return hash
 }
 
 func New() ConcurrentMap {
