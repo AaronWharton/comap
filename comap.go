@@ -1,28 +1,49 @@
 package comap
 
-import "sync"
+import (
+	"sync"
+	"strconv"
+	"fmt"
+)
+
+var COUNT = 32
+
+type ConcurrentMap []*Comap
 
 // The definition to thread-safe concurrent map.
 type Comap struct {
-	comap	map[string]interface{}
+	comap map[string]interface{}
 	sync.RWMutex
 }
 
 // TODO: figure out the reason for []*Comap
 
-func (comap Comap) GetValue(key string) interface{} {
-	comap.RLock()
-	defer comap.RUnlock()
-	return comap.comap[key]
+func (c ConcurrentMap) GetValue(key string) interface{} {
+	val, err := strconv.Atoi(key)
+	if err != nil {
+		fmt.Println(err)
+	}
+	cmap := c[val]
+	defer cmap.RUnlock()
+	return cmap.comap[key]
 }
 
-func (comap Comap) SetValue(key string, value interface{}) {
-	comap.Lock()
-	defer comap.Unlock()
-	comap.comap[key] = value
+func (c ConcurrentMap) SetValue(key string, value interface{}) {
+	val, err := strconv.Atoi(key)
+	if err != nil {
+		fmt.Println(err)
+	}
+	cmap := c[val]
+	cmap.Lock()
+	defer cmap.Unlock()
+	cmap.comap[key] = value
 }
 
-func New() *Comap {
+func New() ConcurrentMap {
 	// TODO:figure out the reason for adding size in make()
-	return &Comap{comap:make(map[string]interface{})}
+	m := make(ConcurrentMap, COUNT)
+	for i := 0; i < COUNT; i++ {
+		m[i] = &Comap{comap: make(map[string]interface{})}
+	}
+	return m
 }
