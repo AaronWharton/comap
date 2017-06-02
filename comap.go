@@ -2,8 +2,6 @@ package comap
 
 import (
 	"sync"
-	"strconv"
-	"fmt"
 )
 
 var COUNT = 32
@@ -18,14 +16,14 @@ type Comap struct {
 
 // TODO: figure out the reason for []*Comap
 
-func (c ConcurrentMap) GetValue(key string) interface{} {
-	val, err := strconv.Atoi(key)
-	if err != nil {
-		fmt.Println(err)
-	}
-	cmap := c[val]
-	defer cmap.RUnlock()
-	return cmap.comap[key]
+func (m ConcurrentMap) Get(key string) (interface{}, bool) {
+	// Get shard
+	shard := m.GetShard(key)
+	shard.RLock()
+	// Get item from shard.
+	val, ok := shard.comap[key]
+	shard.RUnlock()
+	return val, ok
 }
 
 func (m ConcurrentMap) Set(key string, value interface{}) {
