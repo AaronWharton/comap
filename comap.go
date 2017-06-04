@@ -39,23 +39,22 @@ func (m CoMap) Set(key string, value interface{}) {
 	elem.Unlock()
 }
 
-// Get the corresponding key's map: .
+// Get the corresponding key's map.
 func (m CoMap) GetShard(key string) *ConcurrentMap {
 	return m[uint(hash(key))%uint(COUNT)]
 }
 
-// TODO: improving...
+// hashing: bit shifting
 func hash(key string) uint32 {
-	hash := uint32(3124590231)
-	const prime32 = uint32(19756321)
+	var hash = uint32(len(key))
+	const prime uint32 = 16777619
 	for i := 0; i < len(key); i++ {
-		hash *= prime32
-		hash ^= uint32(key[i])
+		hash = (hash << 4) ^ (hash >> 28) ^ uint32(key[i])
 	}
-	return hash
+	return hash % prime
 }
 
-// make a new CoMap
+// Create a new CoMap.
 func New() CoMap {
 	m := make(CoMap, COUNT)
 	for i := 0; i < COUNT; i++ {
