@@ -2,6 +2,7 @@ package comap
 
 import (
 	"sync"
+	"fmt"
 )
 
 // Specify the number of the elements when CoMap is allocated.
@@ -24,7 +25,8 @@ func (m CoMap) Get(key string) (interface{}, bool) {
 	// Get ConcurrentMap from elem.
 	val, ok := elem.concurrentMap[key]
 	if !ok {
-		panic("error occurred when executing elem.concurrentMap[key]")
+		fmt.Errorf("can not get val correctly when executing elem.concurrentMap[key]")
+		// panic("error occurred when executing elem.concurrentMap[key]")
 	}
 	elem.RUnlock()
 	return val, ok
@@ -47,6 +49,7 @@ func (m CoMap) GetShard(key string) *ConcurrentMap {
 // hashing: bit shifting
 func hash(key string) uint32 {
 	var hash = uint32(len(key))
+	// prime is a prime number to execute hashing bit shifting operation.
 	const prime uint32 = 16777619
 	for i := 0; i < len(key); i++ {
 		hash = (hash << 4) ^ (hash >> 28) ^ uint32(key[i])
