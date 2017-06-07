@@ -17,7 +17,7 @@ func TestCoMap_Get(t *testing.T) {
 	}
 
 	// Test the existed element.
-	comap.Set("aaron", "Aaron")	// Set aaron and Aaron where key and value are both string.
+	comap.Set("aaron", "Aaron") // Set aaron and Aaron where key and value are both string.
 
 	result, ok := comap.Get("aaron")
 

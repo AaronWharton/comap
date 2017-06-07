@@ -8,16 +8,16 @@ import (
 // COUNT specify the number of the elements when CoMap is allocated.
 const COUNT = 32
 
-// ConcurrentMap is encapsulated into an array called CoMap.
+// CoMap encapsulates the ConcurrentMap into array.
 type CoMap []*ConcurrentMap
 
-// The definition about thread-safe concurrent map.
+// ConcurrentMap defines a thread-safe concurrent map.
 type ConcurrentMap struct {
 	concurrentMap map[string]interface{}
 	sync.RWMutex
 }
 
-// Get() gets the CoMap[key]'s value.
+// Get gets the CoMap[key]'s value.
 func (m CoMap) Get(key string) (interface{}, bool) {
 	// Get elem
 	elem := m.GetShard(key)
@@ -33,7 +33,7 @@ func (m CoMap) Get(key string) (interface{}, bool) {
 	return val, ok
 }
 
-// Set() sets the CoMap[key]'s value.
+// Set sets the CoMap[key]'s value.
 func (m CoMap) Set(key string, value interface{}) {
 	// Get map elem.
 	elem := m.GetShard(key)
@@ -42,7 +42,7 @@ func (m CoMap) Set(key string, value interface{}) {
 	elem.Unlock()
 }
 
-// GetShard() gets the corresponding key's map.
+// GetShard gets the corresponding key's map.
 func (m CoMap) GetShard(key string) *ConcurrentMap {
 	return m[uint(hash(key))%uint(COUNT)]
 }
@@ -58,7 +58,7 @@ func hash(key string) uint32 {
 	return hash % prime
 }
 
-// New() creates a new CoMap with capacity COUNT.
+// New creates a new CoMap with capacity COUNT.
 func New() CoMap {
 	m := make(CoMap, COUNT)
 	for i := 0; i < COUNT; i++ {
