@@ -10,9 +10,18 @@ thread-safe concurrent map written by go
 - Simple implementation for concurrent map
 - Very light-weight, just a `.go` file!
 
+
+## Install
+
+```
+go get github.com/AaronWharton/comap
+```
+
+
 ## Todo
 
 - More functions are needed
 - Add testing performance
+
 
 Any issue is welcome!
