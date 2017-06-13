@@ -2,7 +2,6 @@ package comap
 
 import (
 	"sync"
-	"fmt"
 )
 
 // COUNT specify the number of the elements when CoMap is allocated.
@@ -18,19 +17,14 @@ type ConcurrentMap struct {
 }
 
 // Get gets the CoMap[key]'s value.
-func (m CoMap) Get(key string) (interface{}, bool) {
+func (m CoMap) Get(key string) (interface{}) {
 	// Get elem
 	elem := m.GetShard(key)
 	elem.RLock()
 	// Get ConcurrentMap from elem.
-	val, ok := elem.concurrentMap[key]
-	if !ok {
-		// error information need to be improved...
-		fmt.Errorf("can not get val correctly when executing elem.concurrentMap[key]")
-		// panic("error occurred when executing elem.concurrentMap[key]")
-	}
+	val := elem.concurrentMap[key]
 	elem.RUnlock()
-	return val, ok
+	return val
 }
 
 // Set sets the CoMap[key]'s value.
